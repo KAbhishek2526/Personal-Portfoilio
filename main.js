@@ -1,85 +1,69 @@
 /* ============================================
-   PORTFOLIO — Main JavaScript
-   Scroll reveal, navbar behavior, mobile menu
+   PORTFOLIO — JavaScript
+   Scroll reveal, Navbar, Active link, Mobile menu
    ============================================ */
 
 // ---------- SCROLL REVEAL ----------
-const revealElements = document.querySelectorAll('.reveal');
-
+const revealEls = document.querySelectorAll('.reveal');
 const revealObserver = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('active');
-      }
+      if (entry.isIntersecting) entry.target.classList.add('active');
     });
   },
-  { threshold: 0.12 }
+  { threshold: 0.1 }
 );
+revealEls.forEach((el) => revealObserver.observe(el));
 
-revealElements.forEach((el) => revealObserver.observe(el));
-
-// ---------- NAVBAR SCROLL EFFECT ----------
+// ---------- NAVBAR SCROLL ----------
 const navbar = document.getElementById('navbar');
-
 window.addEventListener('scroll', () => {
-  if (window.scrollY > 60) {
-    navbar.classList.add('scrolled');
-  } else {
-    navbar.classList.remove('scrolled');
-  }
+  navbar.classList.toggle('scrolled', window.scrollY > 50);
 });
 
-// ---------- ACTIVE NAV LINK ON SCROLL ----------
+// ---------- ACTIVE NAV LINK ----------
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-link');
 
-function updateActiveNav() {
-  const scrollY = window.scrollY + 120;
-  sections.forEach((section) => {
-    const top = section.offsetTop;
-    const height = section.offsetHeight;
-    const id = section.getAttribute('id');
-    if (scrollY >= top && scrollY < top + height) {
-      navLinks.forEach((link) => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${id}`) {
-          link.classList.add('active');
-        }
+function setActiveNav() {
+  const y = window.scrollY + 140;
+  sections.forEach((sec) => {
+    const top = sec.offsetTop;
+    const id = sec.getAttribute('id');
+    if (y >= top && y < top + sec.offsetHeight) {
+      navLinks.forEach((l) => {
+        l.classList.toggle('active', l.getAttribute('href') === `#${id}`);
       });
     }
   });
 }
-
-window.addEventListener('scroll', updateActiveNav);
+window.addEventListener('scroll', setActiveNav);
 
 // ---------- SMOOTH SCROLL ----------
 navLinks.forEach((link) => {
   link.addEventListener('click', (e) => {
     const href = link.getAttribute('href');
-    if (href && href.startsWith('#')) {
+    if (href?.startsWith('#')) {
       e.preventDefault();
-      const target = document.querySelector(href);
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
-      // Close mobile menu if open
-      navLinksContainer.classList.remove('open');
+      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+      navLinksEl.classList.remove('open');
+      navToggle.classList.remove('active');
     }
   });
 });
 
 // ---------- MOBILE MENU ----------
 const navToggle = document.getElementById('navToggle');
-const navLinksContainer = document.getElementById('navLinks');
+const navLinksEl = document.getElementById('navLinks');
 
 navToggle.addEventListener('click', () => {
-  navLinksContainer.classList.toggle('open');
+  navLinksEl.classList.toggle('open');
+  navToggle.classList.toggle('active');
 });
 
-// Close menu when clicking outside
 document.addEventListener('click', (e) => {
-  if (!navLinksContainer.contains(e.target) && !navToggle.contains(e.target)) {
-    navLinksContainer.classList.remove('open');
+  if (!navLinksEl.contains(e.target) && !navToggle.contains(e.target)) {
+    navLinksEl.classList.remove('open');
+    navToggle.classList.remove('active');
   }
 });
